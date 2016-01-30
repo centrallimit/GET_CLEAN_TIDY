@@ -2,16 +2,20 @@
 # Assignment Week 4 
 # 
 # Author: Andreas Kunert
-# 
+# Titel: run_analysis.R
 ###############################################################################
+# 
 library(dplyr)
 library(tidyr)
 
-# setwd("C:/Users/Kunert/Dropbox/GET_CLEAN_TIDY/DATA/UCI HAR Dataset/test")
+##### STEP 1: Merging Data
+#####
+
+# Setting the working directory 
 setwd("~/Documents/GET_CLEAN_TIDY/GET_CLEAN_TIDY/DATA/UCI HAR Dataset/test")
 
 
-# Reading in the Data ---
+# Reading
 
 
 # DATA SET -- TEST SET --- 30% of the 30 volunteers - (9)
@@ -58,17 +62,20 @@ LabelFeatures <- read.table(fileFeaturesLabel)
 # Load activity description
 LabelActivities <- read.table(fileActivityLabel)
 
-
+# Des
 names(data_test) <- LabelFeatures[,2]
 names(data_train) <- LabelFeatures[,2]
 
 
+# Selection of all variables from  that contain Mean or Std in their name
 Test_ES_DF <- data_test[, grep("[Mm]ean|[Ss]td", names(data_test), value = TRUE)]
 Train_ES_DF <- data_train[, grep("[Mm]ean|[Ss]td", names(data_train), value = TRUE)]
 
 rm(data_train)
 rm(data_test)
 
+
+# Merging the 
 Test_DF <- cbind(subject_test, activity_test, Test_ES_DF)
 Training_DF <- cbind(subject_train, activity_train, Train_ES_DF)
 
@@ -79,9 +86,9 @@ names(Test_DF)[2] <- "NActivity"
 names(Training_DF)[2] <- "NActivity"
 
 
-
+# Merging the test and train data to one complete dataset
 Tidy_Data <- tbl_df(rbind(Test_DF,  Training_DF))
-
+# Removing some data (housekeeping operation)
 rm(Test_DF)
 rm(Training_DF)
 
@@ -105,7 +112,10 @@ write.csv(names(Tidy_Data), file = "VARIABLE_NAMES.csv")
 # Computation of each subject and eac
 Mean_DF <- Tidy_Data %>%
 group_by(nsubject, nactivity) %>%
-summarise(mean(tbodyaccmeanx))
+summarise_each(funs(mean))
+
+write.csv(Mean_DF, file = "MEAN_DATA.csv")
+
 
         
 
